@@ -7,6 +7,7 @@
 #include <sys/procfs.h>
 #include <sys/fcntl.h>
 #include <pwd.h>
+#include<string.h>
 
 int get_info(pid_t pid);
 
