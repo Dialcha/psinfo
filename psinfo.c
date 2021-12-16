@@ -18,6 +18,10 @@ int main(int argc, char *argv[])
         //error message
     }
     x = strtol(argv[1], NULL, 10);
+    if(argv[1] =="-l")
+        printf('punto 2')
+    else
+        printf('punto1')
     get_info(x);
 }
 
