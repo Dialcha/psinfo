@@ -7,6 +7,7 @@
 #include <sys/procfs.h>
 #include <sys/fcntl.h>
 #include <pwd.h>
+
 char *getWaitChannel(int pid);
 char *getPath(int pid);
 char *getUserName(int uid);
