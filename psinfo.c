@@ -17,12 +17,28 @@ int main(int argc, char *argv[])
     {
         //error message
     }
-    x = strtol(argv[1], NULL, 10);
-    if(argv[1] =="-l")
-        printf('punto 2')
-    else
-        printf('punto1')
-    get_info(x);
+    int value=strcmp(argv[1],"-l");  
+    if(value==0){
+        printf("punto 2\n");
+        int i, aux;
+        pid_t* p;
+        printf("%d\n", (argc)); 
+        p = malloc(argc*sizeof(pid_t));
+        for (aux = 0 ; aux < argc-2; aux++)
+        {
+            *(p + aux) = strtol(argv[aux+2], NULL, 10);
+        }
+
+        for (i = 0; i < argc-2; i++)
+        {
+            printf("%d\n", *(p+i));
+        }
+    }
+    else{
+        printf("punto1\n");
+        x = strtol(argv[1], NULL, 10);
+        get_info(x);
+    }
 }
 
 int get_info(pid_t pid)
