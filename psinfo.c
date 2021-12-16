@@ -1,54 +1,54 @@
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/procfs.h>
+#include <sys/fcntl.h>
+#include <pwd.h>
 
-void getProperty(char *attrib, FILE* f);
+int get_info(pid_t pid);
 
-void main(int argc, char **argv) {
-    int pid;
-    char filename[1000], line[100], *p;
-    FILE *f;
-
-    sscanf(argv[1], "%d", &pid);
-    printf("pid = %d\n", pid);
-    sprintf(filename, "/proc/%d/status", pid);
-    printf("Nombre del archivo = %s\n", filename);
-
-    f = fopen(filename, "r");
-    // if(!f)
-    //     fclose(f);
-    //     printf("%s\n", "No entro al file");
-    //     return;
-
-    getProperty("State", f);
-
-// FUNCIONAL
-    // while(fgets(line, 100, f)) {
-    //     if(strncmp(line, "State:", 6) != 0)
-    //         continue;
-    //     p = line + 7;
-    //     while(isspace(*p)) ++p;
-
-    //     printf("%6d %s", pid, p);
-    //     break;
-    // }
-
-
-    fclose(f);
+int main(int argc, char *argv[])
+{
+    long x;
+    if (argc < 2)
+    {
+        //error message
+    }
+    x = strtol(argv[1], NULL, 10);
+    get_info(x);
 }
 
-void getProperty(char *attrib, FILE *f){
-    char line[100], *p;
-    while(fgets(line, 100, &f)) {
-        if(strncmp(line, "State:", 6) != 0)
-            continue;
-        p = line + 7;
-        while(isspace(*p)) ++p;
+int get_info(pid_t pid)
+{
+    char path[40], line[100], *p, stateChar[100], Name[100], VmExe[100], VmData[100], VmStk[100], VmSize[100];
+    FILE *statusf;
+    char buf[100];
+    int voluntary, nonvoluntary;
+    snprintf(path, 40, "/proc/%d/status", pid);
+    statusf = fopen(path, "r");
+    if (statusf == NULL)
+        return -1;
 
-        printf("%s %s", attrib, p);
-        break;
+    while (fgets(buf, sizeof buf, statusf) != NULL)
+    {
+        sscanf(buf, "State:  %s", stateChar);
+        sscanf(buf, "Name:  %s", Name);
+        sscanf(buf, "VmSize: %s", VmSize);
+        sscanf(buf, "VmExe: %s", VmExe);
+        sscanf(buf, "VmData: %s", VmData);
+        sscanf(buf, "VmStk: %s", VmStk);
+        sscanf(buf, "voluntary_ctxt_switches: %d", &voluntary);
+        sscanf(buf, "nonvoluntary_ctxt_switches: %d", &nonvoluntary);
     }
+    printf("Nombre del proceso: %s\n", Name);
+    printf("Estado: %s\n", stateChar);
+    printf("Tamaño total de la imagen de memoria: %s\n", VmSize);
+    printf("\tTamaño de la memoria en la región TEXT: %s\n", VmExe);
+    printf("\tTamaño de la memoria en la región DATA: %s\n", VmData);
+    printf("\tTamaño de la memoria en la región STACK: %s\n", VmStk);
+    printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %d - %d\n", voluntary, nonvoluntary);
+    fclose(statusf);
 }
